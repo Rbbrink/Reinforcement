@@ -17,8 +17,6 @@ import inspect
 import heapq, random
 import cStringIO
 
-#yoran was here ;)
-
 class FixedRandom:
     def __init__(self):
         fixedState = (3, (2147483648L, 507801126L, 683453281L, 310439348L, 2597246090L, \
