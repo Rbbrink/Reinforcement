@@ -45,8 +45,8 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-
-
+                
+    
     def getValue(self, state):
         """
           Return the value of the state (computed in __init__).
@@ -72,7 +72,8 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return []
+       
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
