@@ -49,6 +49,10 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+<<<<<<< HEAD
+                
+    
+=======
 
         for y in mdp.getStates():
             self.values[y] = 0
@@ -73,6 +77,7 @@ class ValueIterationAgent(ValueEstimationAgent):
 
 
 
+>>>>>>> 9eee2b8015b43dd6e7ba32edb2c4725c7e4104ae
     def getValue(self, state):
         """
           Return the value of the state (computed in __init__).
@@ -131,12 +136,17 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+<<<<<<< HEAD
+        return []
+       
+=======
         directionlist = ['North', 'East', 'South', 'West']
         val = self.values[state]
         action = 'North'
         for x in directionlist:
             if (self.values[(state, x)] == val):
                 return action
+>>>>>>> 9eee2b8015b43dd6e7ba32edb2c4725c7e4104ae
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
