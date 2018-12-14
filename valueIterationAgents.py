@@ -49,27 +49,23 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-
         for y in mdp.getStates():
-            self.values[y] = 0
+            self.values[y] = 1
 
+        oldvalues = self.values.copy()
         for x in range(iterations):
             for y in mdp.getStates():
-                pa = mdp.getPossibleActions(y)
-                for z in pa:
-                    self.computeQValueFromValues(y, z) 
-                print 99
-                print self.values[y]
-                self.updateValue(y) 
-                print self.values[y]            
-
-                    # tsap = mdp.getTransitionStatesAndProbs(y, z)
-                    # totval = 0
-                    # for a in tsap
-                    #     i j = a
-                    #     totval += j * getValue(i)
+                maxq = None
+                for z in self.mdp.getPossibleActions(y):
+                    newq = self.computeQValueFromValues(y, z)
+                    if (maxq is None or newq > maxq):
+                        maxq = newq
+                if (maxq is None):
+                    maxq = 0
+                oldvalues[y] = maxq 
+            self.values = oldvalues
         for y in mdp.getStates():
-            self.getPolicy(y)                
+            self.getPolicy(y)     
 
 
 
@@ -89,21 +85,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         StatesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
         totval = 0
         for a in StatesAndProbs:
-            (x, y) = a
-            totval += y * (self.mdp.getReward(state, action, x) + self.discount * self.getValue(x))
-        self.values[(state, action)] = totval
-
-    def updateValue(self, state):
-        if (not self.mdp.isTerminal(state)):
-            directionlist = ['North', 'East', 'South', 'West']
-            maxval = None
-            for x in directionlist:
-                if maxval is None or self.values[(state, x)] > maxval:
-                    maxval = self.values[(state, x)]
-            self.values[state] = maxval
-        else:
-            self.values[state] = self.mdp.getReward(state,(),state)
-            print self.mdp.getReward(state,(),state)
+            (nextstate, prob) = a
+            totval += prob * (self.mdp.getReward(state, action, nextstate) + (self.discount * self.getValue(nextstate)))
+        return totval
 
     def computeActionFromValues(self, state):
         """
@@ -115,12 +99,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        directionlist = ['North', 'East', 'South', 'West']
-        val = self.values[state]
-        action = 'North'
+        directionlist = self.mdp.getPossibleActions(state)
+        maxq = None
+        action = None
         for x in directionlist:
-            if (self.values[(state, x)] == val):
-                return action
+            newq = self.computeQValueFromValues(state, x)
+            if (maxq is None or newq > maxq):
+                maxq = newq
+                action = x
+        return action
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
