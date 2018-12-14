@@ -49,8 +49,8 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        oldvalues = self.values.copy()
         for x in range(iterations):
+            oldvalues = self.values.copy()
             for y in mdp.getStates():
                 maxq = None
                 for z in self.mdp.getPossibleActions(y):
