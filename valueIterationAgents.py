@@ -57,13 +57,19 @@ class ValueIterationAgent(ValueEstimationAgent):
             for y in mdp.getStates():
                 pa = mdp.getPossibleActions(y)
                 for z in pa:
-                    self.computeQValueFromValues(y, z)
+                    self.computeQValueFromValues(y, z) 
+                print 99
+                print self.values[y]
+                self.updateValue(y) 
+                print self.values[y]            
 
                     # tsap = mdp.getTransitionStatesAndProbs(y, z)
                     # totval = 0
                     # for a in tsap
                     #     i j = a
-                    #     totval += j * getValue(i)                   
+                    #     totval += j * getValue(i)
+        for y in mdp.getStates():
+            self.getPolicy(y)                
 
 
 
@@ -87,6 +93,18 @@ class ValueIterationAgent(ValueEstimationAgent):
             totval += y * (self.mdp.getReward(state, action, x) + self.discount * self.getValue(x))
         self.values[(state, action)] = totval
 
+    def updateValue(self, state):
+        if (not self.mdp.isTerminal(state)):
+            directionlist = ['North', 'East', 'South', 'West']
+            maxval = None
+            for x in directionlist:
+                if maxval is None or self.values[(state, x)] > maxval:
+                    maxval = self.values[(state, x)]
+            self.values[state] = maxval
+        else:
+            self.values[state] = self.mdp.getReward(state,(),state)
+            print self.mdp.getReward(state,(),state)
+
     def computeActionFromValues(self, state):
         """
           The policy is the best action in the given state
@@ -98,13 +116,11 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
         directionlist = ['North', 'East', 'South', 'West']
-        maxval = 0
+        val = self.values[state]
         action = 'North'
         for x in directionlist:
-            if (self.values[(state, x)] > maxval):
-                maxval = self.values[(state, x)] > maxval
-                action = x
-        return action
+            if (self.values[(state, x)] == val):
+                return action
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
