@@ -58,10 +58,10 @@ class ValueIterationAgent(ValueEstimationAgent):
                 pa = mdp.getPossibleActions(y)
                 for z in pa:
                     self.computeQValueFromValues(y, z) 
-                print 99
-                print self.values[y]
+                #print 99
+                #print self.values[y]
                 self.updateValue(y) 
-                print self.values[y]            
+                #print self.values[y]            
 
                     # tsap = mdp.getTransitionStatesAndProbs(y, z)
                     # totval = 0
@@ -86,12 +86,28 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        StatesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
-        totval = 0
-        for a in StatesAndProbs:
-            (x, y) = a
-            totval += y * (self.mdp.getReward(state, action, x) + self.discount * self.getValue(x))
-        self.values[(state, action)] = totval
+        # StatesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
+        # totval = 0
+        # for nextState, probability in StatesAndProbs:
+        #     (x, y) = a
+        #     #print self.discount 
+        #     print 'jaflajdf'
+        #     if(self.mdp.isTerminal(x)):
+        #         print 'Yoeyou'
+        #     print self.getValue(x)
+        #     print 'Reward:'
+        #     print self.mdp.getReward(state, action, x)
+        #     totval += y * (self.mdp.getReward(state, action, x) + self.discount * self.getValue(x))
+        #     print totval
+        value = 0
+        transitionFunction = self.mdp.getTransitionStatesAndProbs(state,action)
+        for nextState, probability in transitionFunction:
+            value += probability * (self.mdp.getReward(state, action, nextState) 
+                  + (self.discount * self.values[nextState]))
+
+        #return value
+        print value
+        self.values[(state, action)] = value
 
     def updateValue(self, state):
         if (not self.mdp.isTerminal(state)):
