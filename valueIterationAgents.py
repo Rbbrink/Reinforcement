@@ -42,25 +42,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.discount = discount
         self.iterations = iterations
         self.values = util.Counter() # A Counter is a dict with default 0
-       
-        # Hoe weet je hoe groot je wereld is?
-        # Is er al een manier om je buurstates te zien of moet dat zelf worden geimplementeerd?
-        
+        self.policy = util.Counter()
+        self.newvalues = self.values.copy()
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        
+        for a in mdp.getStates():
+            self.values[(a, 'Q')] = None
         for x in range(iterations):
-            oldvalues = self.values.copy()
+            self.newvalues = self.values.copy()
             for y in mdp.getStates():
-                maxq = None
                 for z in self.mdp.getPossibleActions(y):
-                    newq = self.computeQValueFromValues(y, z)
-                    if (maxq is None or newq > maxq):
-                        maxq = newq
-                if (maxq is None):
-                    maxq = 0
-                oldvalues[y] = maxq 
-            self.values = oldvalues
+                    self.computeQValueFromValues(y, z)
+            self.values = self.newvalues
 
         for y in mdp.getStates():
             self.getPolicy(y)     
@@ -82,7 +77,12 @@ class ValueIterationAgent(ValueEstimationAgent):
         totval = 0
         for a in StatesAndProbs:
             (nextstate, prob) = a
-            totval += prob * (self.mdp.getReward(state, action, nextstate) + (self.discount * self.getValue(nextstate)))
+            totval += prob * ((self.discount * self.getValue(nextstate)) + self.mdp.getReward(state, action, nextstate))
+        if (self.newvalues[(state, 'Q')] is None or totval > self.newvalues[(state, 'Q')]):
+            self.newvalues[state] = totval
+            self.newvalues[(state, 'Q')] = totval
+            self.policy[state] = action
+        self.newvalues[(state, action)] = totval
         return totval
 
     def computeActionFromValues(self, state):
@@ -95,15 +95,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        directionlist = self.mdp.getPossibleActions(state)
-        maxq = None
-        action = None
-        for x in directionlist:
-            newq = self.computeQValueFromValues(state, x)
-            if (maxq is None or newq > maxq):
-                maxq = newq
-                action = x
-        return action
+        return self.policy[state]
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
@@ -113,4 +105,4 @@ class ValueIterationAgent(ValueEstimationAgent):
         return self.computeActionFromValues(state)
 
     def getQValue(self, state, action):
-        return self.computeQValueFromValues(state, action)
+        return self.newvalues[(state, action)]
