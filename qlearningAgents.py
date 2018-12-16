@@ -92,6 +92,15 @@ class QLearningAgent(ReinforcementAgent):
         if len(possibleActions) == 0:
           return None
 
+        if (self.Qpolicy[state] == 0):
+          V = None
+          for action in possibleActions:
+            Q = self.getQValue(state, action)
+            if (V == None or Q > V):
+              V = Q
+              bestaction =  action
+          return bestaction   
+
         return self.Qpolicy[state]
 
     def getAction(self, state):
@@ -105,13 +114,14 @@ class QLearningAgent(ReinforcementAgent):
           HINT: To pick randomly from a list, use random.choice(list)
         """
         legalActions = self.getLegalActions(state)
-        nractions = len(legalActions)
-        if  nractions == 0:
+
+        if len(legalActions) == 0:
           return None
-        
-        if util.flipCoin(1 - self.epsilon):   
-          return self.computeActionFromQValues(state)     #act normally
-        return legalActions[random.randint(0,nractions)]  #take a random action
+
+        if util.flipCoin(self.epsilon):
+          return random.choice(legalActions)
+
+        return self.computeActionFromQValues(state)
 
     def update(self, state, action, nextState, reward):
         """
