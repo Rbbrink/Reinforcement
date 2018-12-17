@@ -44,7 +44,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.values = util.Counter() # A Counter is a dict with default 0
 
         # Write value iteration code here
-
+        for a in self.mdp.getStates():
+            self.policy[a] = None
         for x in range(iterations):
             newvalues = self.values.copy()
             for y in self.mdp.getStates():
@@ -88,6 +89,15 @@ class ValueIterationAgent(ValueEstimationAgent):
         terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+        #sometimes, this method is called before the first q values are calculated
+        #in that case, this method calculates them once himself
+        if (self.policy[state] is None):
+            maxval = None
+            for z in self.mdp.getPossibleActions(state):
+                currentValue = self.computeQValueFromValues(state, z)
+                if (maxval == None or currentValue > maxval):
+                    maxval = currentValue
+                    self.policy[state] = z 
         return self.policy[state]
 
     def getPolicy(self, state):
