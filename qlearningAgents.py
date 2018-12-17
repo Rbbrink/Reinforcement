@@ -42,6 +42,7 @@ class QLearningAgent(ReinforcementAgent):
 
         self.qvalues = {}
         "*** YOUR CODE HERE ***"
+        # same functionallity as policy in valueiterationAgents.py
         self.Qpolicy = util.Counter()
 
     def getQValue(self, state, action):
@@ -69,6 +70,7 @@ class QLearningAgent(ReinforcementAgent):
         if len(possibleActions) == 0:
           return 0
 
+        # calculate the max q value and remember the action linked to it
         V = None
         for action in possibleActions:
           Q = self.getQValue(state, action)
@@ -76,7 +78,7 @@ class QLearningAgent(ReinforcementAgent):
             V = Q
             self.Qpolicy[state] = action #instead of recalculating the q values in computeActionFromQValues to find the best action, 
                                          #store it in a dictionary when the Q values get calculated right here, and simply read the dictionary in computeActionFromQValues
-            
+        # if there were no possible actions (and V hasn't been altered as a consequence), set it to 0
         if V == None:
           V = 0
         return V
@@ -88,10 +90,13 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        possibleActions = self.getLegalActions(state)     
+        possibleActions = self.getLegalActions(state)  
+        # when there are no possible actions (= in a terminal state) simply return None   
         if len(possibleActions) == 0:
           return None
 
+        # sometimes q values are requested before they have been calculated in computeValueFromQValues
+        # in that case do the calculation here (mostly seems to happen <= 1 times)
         if (self.Qpolicy[state] == 0):
           V = None
           for action in possibleActions:
@@ -100,7 +105,7 @@ class QLearningAgent(ReinforcementAgent):
               V = Q
               bestaction =  action
           return bestaction   
-
+        # return the optimal action which was saved in computeValueFromQValues
         return self.Qpolicy[state]
 
     def getAction(self, state):
@@ -113,11 +118,13 @@ class QLearningAgent(ReinforcementAgent):
           HINT: You might want to use util.flipCoin(prob)
           HINT: To pick randomly from a list, use random.choice(list)
         """
+        # if there are no actions to be taken, return None
         legalActions = self.getLegalActions(state)
 
         if len(legalActions) == 0:
           return None
-
+        # epsilon % of the time, do a random action
+        # otherwise, do the optimal action
         if util.flipCoin(self.epsilon):
           return random.choice(legalActions)
 
@@ -132,9 +139,11 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
+        # initialize qvalues to 0.0 if they haven't been calculated yet
         if (not self.qvalues.__contains__((state, action))):
           self.qvalues[(state, action)] = 0.0
 
+        # calculate new q values
         V = self.qvalues[(state, action)]
         Vnext = self.computeValueFromQValues(nextState)
         newV = (reward + (self.discount * Vnext))
